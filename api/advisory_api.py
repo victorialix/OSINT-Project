@@ -1,15 +1,10 @@
 import requests
 
 def get_travel_advisory(country_code):
-    """
-    Retrieves travel advisory information for a given country code.
-    Uses the Travel Advisory API (no key required).
-    """
-
     url = f"https://www.travel-advisory.info/api?countrycode={country_code}"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         data = response.json()
 
         if "data" not in data or country_code not in data["data"]:
