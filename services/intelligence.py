@@ -1,10 +1,20 @@
-def compute_travel_score(advisory_score, avg_temp, exchange_rate):
+def compute_travel_score(advisory_score, weather, exchange_rate):
     """
     Combines advisory score, temperature, and exchange rate
     into a single travel score.
     Higher = better.
     """
-    temp_factor = max(0, 30 - abs(avg_temp - 22))  # ideal temp ~22°C
+
+    # Extract temperature in Celsius from weather API
+    temp_c = weather["current"]["temperature"]
+
+    # Convert to Fahrenheit
+    temp_f = (temp_c * 9/5) + 32
+
+    # Ideal travel temp ~72°F
+    temp_factor = max(0, 30 - abs(temp_f - 72))
+
+    # Exchange rate factor
     exchange_factor = 1 / exchange_rate if exchange_rate > 0 else 0
 
     score = (advisory_score * 0.5) + (temp_factor * 0.3) + (exchange_factor * 0.2)
@@ -23,15 +33,21 @@ def classify_risk(score):
         return "High Risk"
 
 
-def generate_packing_list(avg_temp, risk_level):
+def generate_packing_list(weather, risk_level):
     """
-    Creates a simple packing list based on weather and risk.
+    Creates a simple packing list based on Fahrenheit temperature and risk.
     """
+
+    # Extract temp in Celsius, convert to Fahrenheit
+    temp_c = weather["current"]["temperature"]
+    temp_f = (temp_c * 9/5) + 32
+
     items = ["Passport", "Phone Charger", "Travel Documents"]
 
-    if avg_temp < 10:
+    # Clothing logic in Fahrenheit
+    if temp_f < 50:
         items.append("Warm Jacket")
-    elif avg_temp < 20:
+    elif temp_f < 68:
         items.append("Light Jacket")
     else:
         items.append("T-Shirts")
