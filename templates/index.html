@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Travel Planner</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+        }
+        #chartImg {
+            margin-top: 20px;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Travel Planner</h1>
+
+    <input id="cityInput" placeholder="Enter a city" style="width: 300px; padding: 8px;" />
+    <br><br>
+
+    <button onclick="getTravelInfo()">Get Travel Info</button>
+    <button onclick="getWeatherChart()">Show Weather Chart</button>
+
+    <div id="results"></div>
+
+    <img id="chartImg" />
+
+    <script>
+        async function getTravelInfo() {
+            const city = document.getElementById("cityInput").value;
+            const res = await fetch(`/api/travel-info?city=${encodeURIComponent(city)}`);
+            const data = await res.json();
+
+            if (data.error) {
+                document.getElementById("results").innerHTML = `<p style="color:red;">${data.error}</p>`;
+                return;
+            }
+
+            document.getElementById("results").innerHTML = `
+                <h3>${data.city}, ${data.country}</h3>
+                <p><strong>Average Temp:</strong> ${data.avg_temp}°C</p>
+                <p><strong>Risk Level:</strong> ${data.risk_level}</p>
+                <p><strong>Advisory:</strong> ${data.advisory_message}</p>
+                <p><strong>Exchange Rate:</strong> ${data.exchange_rate}</p>
+                <p><strong>Packing List:</strong> ${data.packing_list.join(", ")}</p>
+            `;
+        }
+
+        async function getWeatherChart() {
+            const city = document.getElementById("cityInput").value;
+            const res = await fetch(`/api/weather-chart?city=${encodeURIComponent(city)}`);
+            const data = await res.json();
+
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            document.getElementById("chartImg").src = data.chart_url;
+        }
+    </script>
+
+</body>
+</html>
