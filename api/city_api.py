@@ -10,7 +10,7 @@ def get_city_info(city_name):
     params = {"name": city_name, "count": 1}
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, params=params)
         data = response.json()
 
         # If no results found
