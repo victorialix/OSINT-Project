@@ -61,9 +61,9 @@
         data.advisory.message || "No advisory information"
     }</p>
 
-    <p><strong>Exchange Rate:</strong> ${
+    <p><strong>Exchange Rate:</strong> 1 USD  = ${
         data.currency.rate ? data.currency.rate : "Unavailable"
-    }</p>
+    } ${data.currency.currency_code}</p>
 
     <p><strong>Packing List:</strong> ${data.packing_list.join(", ")}</p>
 `;

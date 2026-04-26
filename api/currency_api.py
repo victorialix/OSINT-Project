@@ -1,43 +1,43 @@
 import requests
+def get_exchange_rate(country_name):
 
-def get_exchange_rate(country_code):
-    """
-    Retrieves the exchange rate for the country's currency relative to USD.
-    Uses ExchangeRate API (no key required).
-    """
+    # Fetch all matching countries
+    lookup_url = f"https://restcountries.com/v3.1/name/{country_name}"
+    lookup_res = requests.get(lookup_url).json()
 
-    # First, get the currency code for the country
-    currency_lookup_url = f"https://restcountries.com/v3.1/alpha/{country_code}"
+    if not isinstance(lookup_res, list):
+        return {"error": "Country not found"}
 
-    try:
-        lookup_res = requests.get(currency_lookup_url)
-        lookup_data = lookup_res.json()
+    # Try to find the best match
+    selected = None
+    for c in lookup_res:
+        official = c.get("name", {}).get("official", "").lower()
+        common = c.get("name", {}).get("common", "").lower()
 
-        if not isinstance(lookup_data, list) or "currencies" not in lookup_data[0]:
-            return {"error": "Currency data unavailable"}
+        if country_name.lower() == official or country_name.lower() == common:
+            selected = c
+            break
 
-        # Extract currency code (e.g., EUR, JPY, GBP)
-        currency_code = list(lookup_data[0]["currencies"].keys())[0]
+    # If no exact match, default to the first result
+    if selected is None:
+        selected = lookup_res[0]
 
-    except Exception as e:
-        return {"error": f"Currency lookup failed: {str(e)}"}
+    # Extract currency
+    currencies = selected.get("currencies")
+    if not currencies:
+        return {"error": "Currency data unavailable"}
 
-    # Now get the exchange rate relative to USD
-    rate_url = f"https://open.er-api.com/v6/latest/USD"
+    currency_code = list(currencies.keys())[0]
 
-    try:
-        rate_res = requests.get(rate_url)
-        rate_data = rate_res.json()
+    # Get exchange rate
+    rate_url = "https://open.er-api.com/v6/latest/USD"
+    rate_res = requests.get(rate_url).json()
 
-        if "rates" not in rate_data or currency_code not in rate_data["rates"]:
-            return {"error": "Exchange rate unavailable"}
+    if "rates" not in rate_res or currency_code not in rate_res["rates"]:
+        return {"error": "Exchange rate unavailable"}
 
-        rate = rate_data["rates"][currency_code]
-
-        return {
-            "currency_code": currency_code,
-            "rate": round(rate, 3)
-        }
-
-    except Exception as e:
-        return {"error": f"Exchange rate fetch failed: {str(e)}"}
+    return {
+        "country": selected["name"]["common"],
+        "currency_code": currency_code,
+        "rate": round(rate_res["rates"][currency_code], 3)
+    }
