@@ -1,43 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Travel Planner</title>
+    <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' href="static/styles.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
-        body {
-            font-family: Arial;
-            max-width: 600px;
-            margin: 40px auto;
-        }
-        #results {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ccc;
-        }
-        #chartImg {
-            margin-top: 20px;
-            max-width: 100%;
-        }
+        body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", Arial, Helvetica, sans-serif}
+        .myLink {display: none}
     </style>
 </head>
+<body class="w3-light-grey">
 <body>
 
-    <h1>Travel Planner</h1>
+<div class="w3-bar w3-white w3-border-bottom w3-xlarge">
+  <a href="#" class="w3-bar-item w3-button w3-text-blue w3-hover-blue"><b><i class="fa fa-map-marker w3-margin-right"></i>Travel Planner</b></a>
+</div>
 
-    <input id="cityInput" placeholder="Enter a city" style="width: 300px; padding: 8px;" />
-    <br><br>
+    <div class="main-container">
+        <div class="search-box">
+            <input id="cityInput" type="text" placeholder="Enter a city.." class="search__input">
+            <br><br>
+            <div class="button-group">
+            <button class = "text_button" onclick="getTravelInfo()">Get Travel Info</button>
+            <button class = "text_button" onclick="getWeatherChart()">Show Weather Chart</button>
+            </div>
+        </div>
+            <div id="results" class="results-container">
+        </div>
+    <img id="chartImg" style="margin-top: 10px"/>
+    </div>
 
-    <button onclick="getTravelInfo()">Get Travel Info</button>
-    <button onclick="getWeatherChart()">Show Weather Chart</button>
 
-    <div id="results"></div>
-
-    <img id="chartImg" />
 
     <script>
         async function getTravelInfo() {
             const city = document.getElementById("cityInput").value;
             const res = await fetch(`/api/travel-info?city=${encodeURIComponent(city)}`);
             const data = await res.json();
+            document.getElementById("results").style.display = "block";
 
             if (data.error) {
                 document.getElementById("results").innerHTML = `<p style="color:red;">${data.error}</p>`;
