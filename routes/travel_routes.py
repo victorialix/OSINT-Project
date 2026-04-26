@@ -3,7 +3,7 @@ from api.city_api import get_city_info
 from api.advisory_api import get_travel_advisory
 from api.currency_api import get_exchange_rate
 from services.intelligence import compute_travel_score, classify_risk, generate_packing_list
-from services.weather import get_weather
+from api.weather_api import get_weather
 from services.chart import generate_chart
 
 travel_bp = Blueprint("travel", __name__)
