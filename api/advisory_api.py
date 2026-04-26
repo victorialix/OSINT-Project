@@ -29,7 +29,7 @@ def get_travel_advisory(country_name):
     Returns advisory level and summary message.
     """
 
-    url = "https://travel.state.gov/_res/rss/TAs.xml"
+    url = "https://travel.state.gov/_res/rss/TAsTWs.xml"
 
     try:
         response = requests.get(url)
@@ -71,3 +71,4 @@ def get_travel_advisory(country_name):
 
     except Exception as e:
         return {"error": str(e)}
+

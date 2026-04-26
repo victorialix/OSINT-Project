@@ -48,25 +48,25 @@
             }
 
             document.getElementById("results").innerHTML = `
-    <h3>${data.city}, ${data.country}</h3>
+                <h3>${data.city}, ${data.country}</h3>
 
-    <p><strong>Average Temp:</strong> 
-    ${data.weather.avg_temp}°C 
-    (${(data.weather.avg_temp * 9/5 + 32).toFixed(1)}°F)</p>
+                <p><strong>Average Temp:</strong> 
+                ${data.weather.avg_temp}°C 
+                (${(data.weather.avg_temp * 9/5 + 32).toFixed(1)}°F)</p>
 
 
-    <p><strong>Risk Level:</strong> ${data.risk}</p>
+                <p><strong>Risk Level:</strong> ${data.risk}</p>
 
-    <p><strong>Advisory:</strong> ${
-        data.advisory.message || "No advisory information"
-    }</p>
+                <p><strong>Advisory:</strong> ${data.advisory.score} ${
+                    data.advisory.message ? data.advisory.message : "No advisory information"
+                }</p>
 
-    <p><strong>Exchange Rate:</strong> 1 USD  = ${
-        data.currency.rate ? data.currency.rate : "Unavailable"
-    } ${data.currency.currency_code}</p>
+                <p><strong>Exchange Rate:</strong> 1 USD  = ${
+                    data.currency.rate ? data.currency.rate : "Unavailable"
+                } ${data.currency.currency_code}</p>
 
-    <p><strong>Packing List:</strong> ${data.packing_list.join(", ")}</p>
-`;
+                <p><strong>Packing List:</strong> ${data.packing_list.join(", ")}</p>
+            `;
 
         }
 
