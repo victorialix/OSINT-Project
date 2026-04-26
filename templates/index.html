@@ -48,13 +48,26 @@
             }
 
             document.getElementById("results").innerHTML = `
-                <h3>${data.city}, ${data.country}</h3>
-                <p><strong>Average Temp:</strong> ${data.avg_temp}°C</p>
-                <p><strong>Risk Level:</strong> ${data.risk_level}</p>
-                <p><strong>Advisory:</strong> ${data.advisory_message}</p>
-                <p><strong>Exchange Rate:</strong> ${data.exchange_rate}</p>
-                <p><strong>Packing List:</strong> ${data.packing_list.join(", ")}</p>
-            `;
+    <h3>${data.city}, ${data.country}</h3>
+
+    <p><strong>Average Temp:</strong> 
+    ${data.weather.avg_temp}°C 
+    (${(data.weather.avg_temp * 9/5 + 32).toFixed(1)}°F)</p>
+
+
+    <p><strong>Risk Level:</strong> ${data.risk}</p>
+
+    <p><strong>Advisory:</strong> ${
+        data.advisory.message || "No advisory information"
+    }</p>
+
+    <p><strong>Exchange Rate:</strong> ${
+        data.currency.rate ? data.currency.rate : "Unavailable"
+    }</p>
+
+    <p><strong>Packing List:</strong> ${data.packing_list.join(", ")}</p>
+`;
+
         }
 
         async function getWeatherChart() {

@@ -4,11 +4,11 @@ from api.advisory_api import get_travel_advisory
 from api.currency_api import get_exchange_rate
 from services.intelligence import compute_travel_score, classify_risk, generate_packing_list
 from api.weather_api import get_weather
-from services.chart import generate_chart
+from services.charts import generate_temperature_chart
 
 travel_bp = Blueprint("travel", __name__)
 
-@travel_bp.route("/api/travel-info", methods=["GET"])
+@travel_bp.route("/travel-info", methods=["GET"])
 def travel_info():
     city = request.args.get("city")
 
@@ -28,6 +28,9 @@ def travel_info():
     # 2️⃣ TRAVEL ADVISORY (uses COUNTRY NAME)
     advisory = get_travel_advisory(country_name)
 
+    # Extract numeric advisory score safely
+    advisory_score = advisory.get("score", 5)
+
     # 3️⃣ CURRENCY EXCHANGE RATE (uses COUNTRY NAME)
     currency = get_exchange_rate(country_name)
 
@@ -35,12 +38,16 @@ def travel_info():
     weather = get_weather(lat, lon)
 
     # 5️⃣ TRAVEL INTELLIGENCE
-    score = compute_travel_score(advisory, weather, currency)
+    score = compute_travel_score(advisory_score, weather, currency)
     risk = classify_risk(score)
     packing_list = generate_packing_list(weather, risk)
 
     # 6️⃣ CHART GENERATION
-    chart_path = generate_chart(city_name)
+    chart_path = generate_temperature_chart(
+        weather["max_temps"],
+        weather["min_temps"],
+        city_name
+    )
 
     return jsonify({
         "city": city_name,
