@@ -2,30 +2,28 @@ import requests
 
 def get_city_info(city_name):
     """
-    Uses GeoDB Cities API to get latitude, longitude, and country code.
+    Uses Open-Meteo Geocoding API to get city, country, latitude, and longitude.
+    No API key required.
     """
 
-    url = "https://wft-geo-db.p.rapidapi.com/v1/geo/cities"
-    params = {"namePrefix": city_name}
-    headers = {
-        "X-RapidAPI-Key": "e158d9e616mshee4beb4ee098b4bp109869jsn90213cafe6f6",
-        "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com"
-    }
+    url = "https://geocoding-api.open-meteo.com/v1/search"
+    params = {"name": city_name, "count": 1}
 
     try:
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.get(url)
         data = response.json()
 
-        if "data" not in data or len(data["data"]) == 0:
+        # If no results found
+        if "results" not in data or len(data["results"]) == 0:
             return {"error": "City not found"}
 
-        city = data["data"][0]
+        city = data["results"][0]
 
         return {
-            "city": city["city"],
-            "lat": city["latitude"],
-            "lon": city["longitude"],
-            "country_code": city["countryCode"]
+            "city": city.get("name"),
+            "country": city.get("country"),
+            "lat": city.get("latitude"),
+            "lon": city.get("longitude")
         }
 
     except Exception as e:
