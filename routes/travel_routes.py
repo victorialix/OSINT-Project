@@ -1,58 +1,55 @@
 from flask import Blueprint, request, jsonify
-
-# These imports will work once Person A & B add their files.
-# For now, they won't break anything if the files don't exist yet.
 from api.city_api import get_city_info
-from api.weather_api import get_weather
 from api.advisory_api import get_travel_advisory
 from api.currency_api import get_exchange_rate
-
-from services.intelligence import (
-    compute_travel_score,
-    classify_risk,
-    generate_packing_list
-)
+from services.intelligence import compute_travel_score, classify_risk, generate_packing_list
+from services.weather import get_weather
+from services.chart import generate_chart
 
 travel_bp = Blueprint("travel", __name__)
 
-@travel_bp.get("/travel-info")
+@travel_bp.route("/api/travel-info", methods=["GET"])
 def travel_info():
     city = request.args.get("city")
 
     if not city:
         return jsonify({"error": "City parameter is required"}), 400
 
-    # Get city info (lat, lon, country)
+    # 1️⃣ CITY LOOKUP
     city_data = get_city_info(city)
     if "error" in city_data:
         return jsonify(city_data), 400
 
-    # Get weather data
-    weather = get_weather(city_data["lat"], city_data["lon"])
-    if "error" in weather:
-        return jsonify(weather), 500
+    city_name = city_data["city"]
+    country_name = city_data["country"]
+    lat = city_data["lat"]
+    lon = city_data["lon"]
 
-    # Get travel advisory
-    advisory = get_travel_advisory(city_data["country_code"])
-    if "error" in advisory:
-        return jsonify(advisory), 500
+    # 2️⃣ TRAVEL ADVISORY (uses COUNTRY NAME)
+    advisory = get_travel_advisory(country_name)
 
-    # Get currency exchange rate
-    currency = get_exchange_rate(city_data["country_code"])
-    if "error" in currency:
-        return jsonify(currency), 500
+    # 3️⃣ CURRENCY EXCHANGE RATE (uses COUNTRY NAME)
+    currency = get_exchange_rate(country_name)
 
-    # Intelligence logic
-    score = compute_travel_score(advisory["score"], weather["avg_temp"], currency["rate"])
+    # 4️⃣ WEATHER (uses LAT/LON)
+    weather = get_weather(lat, lon)
+
+    # 5️⃣ TRAVEL INTELLIGENCE
+    score = compute_travel_score(advisory, weather, currency)
     risk = classify_risk(score)
-    packing = generate_packing_list(weather["avg_temp"], risk)
+    packing_list = generate_packing_list(weather, risk)
+
+    # 6️⃣ CHART GENERATION
+    chart_path = generate_chart(city_name)
 
     return jsonify({
-        "city": city_data["city"],
-        "country": city_data["country_code"],
-        "avg_temp": weather["avg_temp"],
-        "risk_level": risk,
-        "advisory_message": advisory["message"],
-        "exchange_rate": currency["rate"],
-        "packing_list": packing
+        "city": city_name,
+        "country": country_name,
+        "advisory": advisory,
+        "currency": currency,
+        "weather": weather,
+        "score": score,
+        "risk": risk,
+        "packing_list": packing_list,
+        "chart": chart_path
     })
