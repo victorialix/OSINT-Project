@@ -22,7 +22,7 @@
     <div class="main-container">
         <div class="search-box">
             <input id="cityInput" type="text" placeholder="Enter a city.." class="search__input">
-            <br><br>
+            <br>
             <div class="button-group">
             <button class = "text_button" onclick="getTravelInfo()">Get Travel Info</button>
             <button class = "text_button" onclick="getWeatherChart()">Show Weather Chart</button>
@@ -30,7 +30,10 @@
         </div>
             <div id="results" class="results-container">
         </div>
-    <img id="chartImg" style="margin-top: 10px"/>
+    <img id="chartImg" style="margin-top: 10px; display:none"/><br>
+    <button class="text_button" id="closeBtn" type="button" onclick="closeChart()" style="display:none">
+        Close &times;
+    </button>
     </div>
 
 
@@ -57,14 +60,14 @@
 
                 <p><strong>Risk Level:</strong> ${data.risk}</p>
 
-                <p><strong>Advisory:</strong> ${data.advisory.score} ${
+                <p><strong>Advisory:</strong> ${
                     data.advisory.message ? data.advisory.message : "No advisory information"
                 }</p>
 
                 <p><strong>Exchange Rate:</strong> 1 USD  = ${
                     data.currency.rate ? data.currency.rate : "Unavailable"
                 } ${data.currency.currency_code}</p>
-
+                
                 <p><strong>Packing List:</strong> ${data.packing_list.join(", ")}</p>
             `;
 
@@ -80,9 +83,21 @@
                 return;
             }
 
-            document.getElementById("chartImg").src = data.chart_url;
+            const img = document.getElementById("chartImg");
+            const closeBtn = document.getElementById("closeBtn");
+
+            img.src = data.chart_url;
+            img.style.display = "block";
+            closeBtn.style.display = "inline-block";
+        }
+
+        function closeChart() {
+            const img = document.getElementById("chartImg");
+            const closeBtn = document.getElementById("closeBtn");
+
+            img.style.display = "none";
+            closeBtn.style.display = "none";
         }
     </script>
-
 </body>
 </html>
